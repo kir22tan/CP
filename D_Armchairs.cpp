@@ -9,44 +9,38 @@ using namespace std;
 #define int long long
 #define all(a) a.begin(), a.end()
 
+int inf=1e11;
+
+int f(int i,int j,vector<vector<int>>&dp,vector<int>&pre,vector<int>&v,vector<int>&on){
+    if(j<0) return 0;
+    if(i<0) return inf;
+    if(pre[i]<j) return inf;
+    if(dp[i][j]!=-1) return dp[i][j];
+
+    int ans = f(i-1,j,dp,pre,v,on);
+    if(v[i]==0){
+        ans = min(ans,abs(i-on[j])+f(i-1,j-1,dp,pre,v,on));
+    }
+
+    return dp[i][j]=ans;
+}
+
 void solution(int test_num){
 
     int n;
     cin>>n;
-    int inf=1e11;
-    vector<int> v(n+1,0);
-    for(int i=1;i<=n;i++) {
+    vector<int> v(n,0),pre(n,0),on;
+    for(int i=0;i<n;i++) {
         cin>>v[i];
-    }
-    int ans=0;
-    for(int i=1;i<=n;i++){
-        if(v[i]==1){
-            int lf=inf,rg=inf;
-            for(int j=i-1;j>=1;j--){
-                if(v[j]==0){
-                    lf=abs(j-i);
-                    break;
-                }
-            }
-            for(int j=i+1;j<=n;j++){
-                if(v[j]==0){
-                    rg=abs(j-i);
-                    break;
-                }
-            }
-            if(lf<rg){
-                v[i-lf]=-1;
-                ans+=lf;
-            }else{
-                v[i+rg]=-1;
-                ans+=rg;
-            }
+        if(v[i]) on.push_back(i);}
+        pre[0]=(v[0]==0)?1:0;
+        for(int i=1;i<n;i++){
+            pre[i]=pre[i-1];
+            pre[i]+=(v[i]==0);
         }
-    }
-    cout<<ans<<endl;
-
-    
-
+    vector<vector<int>>dp(n+1,vector<int>(on.size()+1,-1));
+    debug(pre,on);
+    cout<<f(n-1,on.size()-1,dp,pre,v,on)<<endl;
 }
 
 
